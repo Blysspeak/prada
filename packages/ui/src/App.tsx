@@ -3,9 +3,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from '@/providers/AuthProvider'
 import { SchemaProvider } from '@/providers/SchemaProvider'
 import { SettingsProvider } from '@/providers/SettingsProvider'
+import { SetupProvider, useSetup } from '@/providers/SetupProvider'
 import { Layout } from '@/components/Layout'
 import {
   LoginPage,
+  SetupPage,
   DashboardPage,
   ModelListPage,
   ModelFormPage,
@@ -47,6 +49,30 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function AppRoutes() {
   const { isAuthenticated } = useAuth()
+  const { isConfigured, isLoading: setupLoading } = useSetup()
+
+  if (setupLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        color: '#64748b'
+      }}>
+        Loading...
+      </div>
+    )
+  }
+
+  // If not configured, show setup page
+  if (!isConfigured) {
+    return (
+      <Routes>
+        <Route path="*" element={<SetupPage />} />
+      </Routes>
+    )
+  }
 
   return (
     <Routes>
@@ -86,9 +112,11 @@ export function App() {
     <SettingsProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter basename={basename}>
-          <AuthProvider>
-            <AppRoutes />
-          </AuthProvider>
+          <SetupProvider>
+            <AuthProvider>
+              <AppRoutes />
+            </AuthProvider>
+          </SetupProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </SettingsProvider>

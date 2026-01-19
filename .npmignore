@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+
+# Build outputs (if building locally)
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage directory used by tools like Istanbul
+coverage/
+.nyc_output/
+
+# Temporary folders
+tmp/
+temp/
+
+# Git
+.git/
+.gitignore
+
+# Testing
+test/
+tests/
+
+# Documentation source (already included separately)
+docs/
+
+# Development and build tools
+dev/
+develop/
+build/
+src/
+
+# Configuration for development
+config/
+configs/

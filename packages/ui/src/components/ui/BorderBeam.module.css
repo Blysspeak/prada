@@ -1,0 +1,33 @@
+.container {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.beam {
+  position: absolute;
+  width: var(--beam-size);
+  aspect-ratio: 1;
+  background: linear-gradient(
+    to left,
+    var(--beam-color-from),
+    var(--beam-color-to),
+    transparent
+  );
+  opacity: 0.85;
+  animation: beam-rotate var(--beam-duration) linear infinite;
+  offset-path: rect(0 100% 100% 0 round 24px);
+  filter: blur(2px);
+}
+
+@keyframes beam-rotate {
+  0% {
+    offset-distance: 0%;
+  }
+  100% {
+    offset-distance: 100%;
+  }
+}

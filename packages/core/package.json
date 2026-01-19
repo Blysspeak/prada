@@ -1,7 +1,7 @@
 {
   "name": "@prada/core",
   "version": "1.0.0",
-  "description": "PRADA Core - Schema parser and API generator",
+  "description": "PRADA Core - Schema parser and API generator for Prisma",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,10 +11,14 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "dev": "tsup src/index.js --watch --format esm",
     "build": "tsup src/index.js --format esm --clean",
-    "lint": "eslint src --ext .js"
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@prisma/internals": "^6.0.0",
@@ -23,13 +27,34 @@
     "zod": "^3.24.0"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.10.0",
     "tsup": "^8.3.0",
     "typescript": "^5.7.0"
   },
   "peerDependencies": {
     "@prisma/client": ">=5.0.0"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "blysspeak",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blysspeak/prada.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/blysspeak/prada#readme",
+  "bugs": {
+    "url": "https://github.com/blysspeak/prada/issues"
+  },
+  "keywords": [
+    "prisma",
+    "admin",
+    "crud",
+    "api-generator",
+    "schema-parser",
+    "database",
+    "postgresql"
+  ]
 }

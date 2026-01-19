@@ -1,4 +1,4 @@
-import { Router, static as expressStatic } from 'express'
+import { Router, static as expressStatic, json } from 'express'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import { resolve, dirname } from 'path'
@@ -6,22 +6,23 @@ import { fileURLToPath } from 'url'
 import {
   parseSchema,
   createApiHandler,
-  createAuthService
+  loadConfig,
+  isConfigured,
+  validateCredentials
 } from '@prada/core'
-import { createAuthMiddleware } from './middleware/auth.js'
+import { createAuthMiddleware, createAuthServiceFromConfig, createAuthServiceFromOptions } from './middleware/auth.js'
 import { createAuthRoutes } from './routes/auth.js'
 import { createCrudRoutes } from './routes/crud.js'
+import { createSetupRoutes } from './routes/setup.js'
 
 /**
  * @typedef {Object} PradaServerOptions
  * @property {import('@prisma/client').PrismaClient} prisma
  * @property {string} [schemaPath]
  * @property {Object} [models]
- * @property {Object} [auth]
- * @property {string} [auth.email]
- * @property {string} [auth.password]
- * @property {string} [auth.secret]
+ * @property {Object} [auth] - Auth config: { login, password } or { disabled: true }
  * @property {string} [staticPath]
+ * @property {string} [cwd] - Working directory for config files (default: process.cwd())
  */
 
 /**
@@ -36,6 +37,7 @@ export async function createPradaServer(options) {
     origin: true,
     credentials: true
   }))
+  router.use(json())
   router.use(cookieParser())
 
   let schema
@@ -53,16 +55,57 @@ export async function createPradaServer(options) {
     options.models
   )
 
-  if (options.auth) {
-    const authService = createAuthService(options.auth)
-    const authMiddleware = createAuthMiddleware(authService)
+  // Working directory for config files
+  const cwd = options.cwd || process.cwd()
 
-    router.use('/api/auth', createAuthRoutes(authService))
-
-    router.use('/api', authMiddleware, createCrudRoutes(apiHandler))
-  } else {
-    router.use('/api', createCrudRoutes(apiHandler))
+  // Check if auth is provided directly in options (CLI mode)
+  const getAuthConfig = () => {
+    if (options.auth) {
+      return options.auth
+    }
+    return loadConfig(cwd).auth
   }
+
+  // Setup routes with cwd support
+  router.use('/api/setup', (req, res, next) => {
+    if (options.auth) {
+      // CLI mode with auth provided - always configured
+      if (req.path === '/status') {
+        return res.json({ configured: true })
+      }
+      return res.status(400).json({ error: 'Setup not available in CLI mode' })
+    }
+    // Normal mode - use setup routes with cwd
+    createSetupRoutes(cwd)(req, res, next)
+  })
+
+  // Dynamic auth middleware that reloads config
+  router.use('/api/auth', (req, res, next) => {
+    const authConfig = getAuthConfig()
+    if (!authConfig) {
+      return res.status(503).json({ error: 'Not configured. Please run setup.' })
+    }
+    const authService = options.auth
+      ? createAuthServiceFromOptions(options.auth)
+      : createAuthServiceFromConfig(loadConfig(cwd))
+    const authRoutes = createAuthRoutes(authService)
+    authRoutes(req, res, next)
+  })
+
+  // Protected API routes
+  router.use('/api', (req, res, next) => {
+    const authConfig = getAuthConfig()
+    if (!authConfig) {
+      return res.status(503).json({ error: 'Not configured' })
+    }
+    const authService = options.auth
+      ? createAuthServiceFromOptions(options.auth)
+      : createAuthServiceFromConfig(loadConfig(cwd))
+    const authMiddleware = createAuthMiddleware(authService)
+    authMiddleware(req, res, () => {
+      createCrudRoutes(apiHandler)(req, res, next)
+    })
+  })
 
   const __filename = fileURLToPath(import.meta.url)
   const __dirname = dirname(__filename)
@@ -83,3 +126,4 @@ export async function createPradaServer(options) {
 export { createAuthMiddleware } from './middleware/auth.js'
 export { createAuthRoutes } from './routes/auth.js'
 export { createCrudRoutes } from './routes/crud.js'
+export { createSetupRoutes } from './routes/setup.js'

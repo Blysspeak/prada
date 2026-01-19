@@ -1,4 +1,5 @@
 export { LoginPage } from './LoginPage'
+export { SetupPage } from './SetupPage'
 export { DashboardPage } from './DashboardPage'
 export { ModelListPage } from './ModelListPage'
 export { ModelFormPage } from './ModelFormPage'
