@@ -12,8 +12,8 @@
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
   <a href="#features">Features</a> •
-  <a href="#integration">Integration</a> •
-  <a href="#cli-options">CLI Options</a>
+  <a href="#usage">Usage</a> •
+  <a href="#integration">Integration</a>
 </p>
 
 ---
@@ -21,10 +21,21 @@
 ## Quick Start
 
 ```bash
-npx prada "postgresql://user:password@localhost:5432/mydb"
+# Clone the repository
+git clone https://github.com/blysspeak/prada.git
+cd prada
+
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Run with your database
+node packages/cli/dist/cli.js "postgresql://user:password@localhost:5432/mydb"
 ```
 
-That's it! Browser opens automatically at `http://localhost:3000/admin`.
+Browser opens automatically at `http://localhost:3000/admin`.
 
 On first launch, you'll see a setup page to create admin credentials.
 
@@ -37,52 +48,49 @@ On first launch, you'll see a setup page to create admin credentials.
 - **Fast** — Built with performance in mind
 - **Two modes** — CLI for quick access, middleware for integration
 
-## Installation
+## Requirements
 
-### Option 1: npx (Recommended)
+- Node.js 18+
+- pnpm 8+
+- PostgreSQL database
 
-No installation needed:
+## Usage
 
-```bash
-npx prada "postgresql://user:pass@host:5432/db"
-```
-
-### Option 2: Global Install
+### CLI Mode
 
 ```bash
-npm install -g prada
-prada "postgresql://user:pass@host:5432/db"
+# Basic usage
+node packages/cli/dist/cli.js "postgresql://user:pass@localhost:5432/mydb"
+
+# Custom port
+node packages/cli/dist/cli.js "postgresql://..." --port 8080
+
+# Using environment variable
+DATABASE_URL="postgresql://..." node packages/cli/dist/cli.js
+
+# Don't open browser
+node packages/cli/dist/cli.js "postgresql://..." --no-open
 ```
 
-### Option 3: Add to Project
+### CLI Options
 
-```bash
-npm install prada
 ```
+prada [database-url] [options]
 
-Add to `package.json`:
+Arguments:
+  database-url         PostgreSQL connection string
+                       Can also use DATABASE_URL env variable
 
-```json
-{
-  "scripts": {
-    "admin": "prada"
-  }
-}
-```
-
-Then run:
-
-```bash
-DATABASE_URL="postgresql://..." npm run admin
+Options:
+  -p, --port <port>    Server port (default: 3000)
+  -H, --host <host>    Server host (default: localhost)
+  --no-open            Don't open browser automatically
+  -h, --help           Show help
 ```
 
 ## Integration
 
 For production apps, use `@prada/server` as Express middleware:
-
-```bash
-npm install @prada/server @prisma/client
-```
 
 ```javascript
 import express from 'express'
@@ -100,39 +108,6 @@ app.listen(3000, () => {
 })
 ```
 
-## CLI Options
-
-```
-prada [database-url] [options]
-
-Arguments:
-  database-url         PostgreSQL connection string
-                       Can also use DATABASE_URL env variable
-
-Options:
-  -p, --port <port>    Server port (default: 3000)
-  -H, --host <host>    Server host (default: localhost)
-  --no-open            Don't open browser automatically
-  -h, --help           Show help
-  -v, --version        Show version
-```
-
-### Examples
-
-```bash
-# Basic usage
-npx prada "postgresql://user:pass@localhost:5432/mydb"
-
-# Custom port
-npx prada "postgresql://..." --port 8080
-
-# Using environment variable
-DATABASE_URL="postgresql://..." npx prada
-
-# Don't open browser
-npx prada "postgresql://..." --no-open
-```
-
 ## Authentication
 
 ### First Launch
@@ -145,17 +120,36 @@ Credentials are stored locally in `.prada/credentials`.
 Skip setup by providing credentials via env:
 
 ```bash
-PRADA_LOGIN=admin PRADA_PASSWORD=secret npx prada "postgresql://..."
+PRADA_LOGIN=admin PRADA_PASSWORD=secret node packages/cli/dist/cli.js "postgresql://..."
 ```
 
-## Packages
+## Project Structure
 
-| Package | Description |
-|---------|-------------|
-| [`prada`](./packages/cli) | CLI for instant database admin |
-| [`@prada/server`](./packages/server) | Express middleware for integration |
-| [`@prada/core`](./packages/core) | Schema parser and API generator |
-| [`@prada/ui`](./packages/ui) | React admin interface |
+```
+prada/
+├── packages/
+│   ├── cli/      # CLI entry point
+│   ├── core/     # Schema parser, API generator
+│   ├── server/   # Express middleware
+│   └── ui/       # React frontend
+└── assets/       # Logo and images
+```
+
+## Development
+
+```bash
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Build specific package
+pnpm --filter @prada/ui build
+pnpm --filter @prada/server build
+pnpm --filter @prada/core build
+pnpm --filter prada build
+```
 
 ## Supported Features
 
