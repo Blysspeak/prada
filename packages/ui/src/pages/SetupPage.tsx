@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { KeyRound, Sparkles, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { MorphingText } from '@/components/ui/MorphingText'
+import { useSetup } from '@/providers/SetupProvider'
 import styles from './LoginPage.module.css'
 
 export function SetupPage() {
@@ -13,7 +13,7 @@ export function SetupPage() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  const navigate = useNavigate()
+  const { checkSetup } = useSetup()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,7 +44,8 @@ export function SetupPage() {
         throw new Error(data.error || 'Setup failed')
       }
 
-      navigate('/login')
+      // Re-check setup status - this will trigger redirect to login
+      await checkSetup()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Setup failed')
     } finally {
