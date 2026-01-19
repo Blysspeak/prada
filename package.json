@@ -1,0 +1,25 @@
+{
+  "name": "prada",
+  "version": "1.0.0",
+  "description": "PRADA - PRisma ADmin: Universal admin panel for Prisma ORM projects",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint"
+  },
+  "keywords": [
+    "prisma",
+    "admin",
+    "crud",
+    "react",
+    "express"
+  ],
+  "author": "blysspeak",
+  "license": "MIT",
+  "files": [
+    "README.md",
+    "docs/*"
+  ]
+}

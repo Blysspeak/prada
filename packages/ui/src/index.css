@@ -1,0 +1,186 @@
+/* Geist Font */
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========================================
+   PRADA Design System - CSS Variables
+   ======================================== */
+
+/* Dark theme (default) - based on sidebar style */
+:root,
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-base: #0a0f1a;           /* Deepest background */
+  --bg-primary: #0f172a;        /* Main surfaces */
+  --bg-secondary: #1e293b;      /* Elevated surfaces, inputs */
+  --bg-tertiary: #334155;       /* Buttons, controls */
+  --bg-hover: rgba(255, 255, 255, 0.05);    /* Hover state */
+  --bg-active: rgba(255, 255, 255, 0.1);    /* Active/pressed state */
+
+  /* Text colors */
+  --text-primary: #f1f5f9;      /* Main text */
+  --text-secondary: #e2e8f0;    /* Secondary text */
+  --text-muted: #94a3b8;        /* Muted text */
+  --text-dimmed: #64748b;       /* Dimmest text, labels */
+
+  /* Borders */
+  --border: #1e293b;            /* Default border */
+  --border-subtle: rgba(255, 255, 255, 0.1);  /* Subtle border */
+  --border-light: #334155;      /* Light border */
+
+  /* Brand colors */
+  --primary: #3b82f6;           /* Primary accent */
+  --primary-hover: #2563eb;     /* Primary hover */
+  --primary-bg: rgba(59, 130, 246, 0.15);   /* Primary background */
+  --primary-text: #60a5fa;      /* Primary text color */
+
+  /* Status colors */
+  --danger: #f87171;            /* Error/danger */
+  --danger-hover: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.15);
+  --danger-border: rgba(239, 68, 68, 0.3);
+
+  --success: #22c55e;           /* Success */
+  --success-bg: rgba(34, 197, 94, 0.15);
+
+  --warning: #f59e0b;           /* Warning */
+  --warning-bg: rgba(245, 158, 11, 0.15);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+
+  /* Inputs */
+  --input-bg: var(--bg-secondary);
+  --input-border: var(--border-light);
+  --input-focus-border: var(--primary);
+  --input-focus-ring: rgba(59, 130, 246, 0.15);
+}
+
+/* Light theme */
+[data-theme="light"] {
+  /* Backgrounds */
+  --bg-base: #f1f5f9;           /* Deepest background */
+  --bg-primary: #ffffff;        /* Main surfaces */
+  --bg-secondary: #f8fafc;      /* Elevated surfaces */
+  --bg-tertiary: #f1f5f9;       /* Buttons, controls */
+  --bg-hover: rgba(0, 0, 0, 0.03);    /* Hover state */
+  --bg-active: rgba(0, 0, 0, 0.06);   /* Active/pressed state */
+
+  /* Text colors */
+  --text-primary: #0f172a;      /* Main text */
+  --text-secondary: #334155;    /* Secondary text */
+  --text-muted: #64748b;        /* Muted text */
+  --text-dimmed: #94a3b8;       /* Dimmest text, labels */
+
+  /* Borders */
+  --border: #e2e8f0;            /* Default border */
+  --border-subtle: rgba(0, 0, 0, 0.08);  /* Subtle border */
+  --border-light: #cbd5e1;      /* Light border */
+
+  /* Brand colors */
+  --primary: #3b82f6;           /* Primary accent */
+  --primary-hover: #2563eb;     /* Primary hover */
+  --primary-bg: rgba(59, 130, 246, 0.1);   /* Primary background */
+  --primary-text: #2563eb;      /* Primary text color */
+
+  /* Status colors */
+  --danger: #dc2626;            /* Error/danger */
+  --danger-hover: #b91c1c;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+
+  --success: #16a34a;           /* Success */
+  --success-bg: #f0fdf4;
+
+  --warning: #d97706;           /* Warning */
+  --warning-bg: #fffbeb;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+
+  /* Inputs */
+  --input-bg: var(--bg-primary);
+  --input-border: var(--border);
+  --input-focus-border: var(--primary);
+  --input-focus-ring: rgba(59, 130, 246, 0.15);
+}
+
+/* ========================================
+   Global Styles
+   ======================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Geist Variable', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Monospace for code and data */
+code, pre, .mono {
+  font-family: 'Geist Mono Variable', ui-monospace, monospace;
+}
+
+/* View Transition API for theme switching */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+}
+
+/* ========================================
+   Tailwind Components Layer
+   ======================================== */
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200;
+  }
+}
