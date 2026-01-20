@@ -1,17 +1,17 @@
-# @prada/core
+# @blysspeak/prada-core
 
 Core library for PRADA admin panel. Provides schema parsing and API generation for Prisma.
 
 ## Installation
 
 ```bash
-npm install @prada/core
+npm install @blysspeak/prada-core
 ```
 
 ## Usage
 
 ```javascript
-import { parseSchema, createApiHandler } from '@prada/core'
+import { parseSchema, createApiHandler } from '@blysspeak/prada-core'
 
 // Parse Prisma schema
 const schema = await parseSchema('./prisma/schema.prisma')

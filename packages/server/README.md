@@ -1,18 +1,18 @@
-# @prada/server
+# @blysspeak/prada-server
 
 Express middleware for PRADA admin panel. Integrate beautiful database admin into your existing project.
 
 ## Installation
 
 ```bash
-npm install @prada/server
+npm install @blysspeak/prada-server
 ```
 
 ## Usage
 
 ```javascript
 import express from 'express'
-import { createPradaServer } from '@prada/server'
+import { createPradaServer } from '@blysspeak/prada-server'
 import { PrismaClient } from '@prisma/client'
 
 const app = express()
@@ -60,7 +60,7 @@ PRADA_PASSWORD=secret
 For quick database access without integration, use the CLI:
 
 ```bash
-npx prada "postgresql://user:pass@host:5432/db"
+npx @blysspeak/prada "postgresql://user:pass@host:5432/db"
 ```
 
 ## License

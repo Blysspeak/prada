@@ -1,5 +1,5 @@
 {
-  "name": "prada",
+  "name": "@blysspeak/prada",
   "version": "1.0.0",
   "description": "PRADA - Fast admin for your projects. Instant PostgreSQL database admin panel.",
   "type": "module",
@@ -23,8 +23,8 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@prada/core": "workspace:*",
-    "@prada/server": "workspace:*",
+    "@blysspeak/prada-core": "workspace:*",
+    "@blysspeak/prada-server": "workspace:*",
     "@prisma/client": "~6.19.0",
     "citty": "^0.1.6",
     "consola": "^3.4.2",

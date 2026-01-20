@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { randomBytes, createHash } from 'crypto'
-import { validateCredentials } from '@prada/core'
+import { validateCredentials } from '@blysspeak/prada-core'
 
 const DEFAULT_SECRET = 'prada-default-secret-change-me'
 

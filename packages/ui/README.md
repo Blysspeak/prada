@@ -1,10 +1,10 @@
-# @prada/ui
+# @blysspeak/prada-ui
 
 React-based admin panel interface for PRADA.
 
 ## About
 
-This package contains the pre-built UI for PRADA admin panel. It's automatically included when you use `@prada/server` or the `prada` CLI.
+This package contains the pre-built UI for PRADA admin panel. It's automatically included when you use `@blysspeak/prada-server` or the `prada` CLI.
 
 ## For Development
 

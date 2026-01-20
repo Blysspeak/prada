@@ -1,5 +1,5 @@
 {
-  "name": "@prada/server",
+  "name": "@blysspeak/prada-server",
   "version": "1.0.0",
   "description": "PRADA Server - Express middleware for Prisma Admin Panel",
   "type": "module",
@@ -21,8 +21,8 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@prada/core": "workspace:*",
-    "@prada/ui": "workspace:*",
+    "@blysspeak/prada-core": "workspace:*",
+    "@blysspeak/prada-ui": "workspace:*",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^4.21.0",

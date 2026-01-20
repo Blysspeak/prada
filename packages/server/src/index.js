@@ -9,7 +9,7 @@ import {
   loadConfig,
   isConfigured,
   validateCredentials
-} from '@prada/core'
+} from '@blysspeak/prada-core'
 import { createAuthMiddleware, createAuthServiceFromConfig, createAuthServiceFromOptions } from './middleware/auth.js'
 import { createAuthRoutes } from './routes/auth.js'
 import { createCrudRoutes } from './routes/crud.js'
@@ -110,7 +110,18 @@ export async function createPradaServer(options) {
   const __filename = fileURLToPath(import.meta.url)
   const __dirname = dirname(__filename)
 
-  const staticPath = options.staticPath || resolve(__dirname, '../../ui/dist')
+  // Resolve UI path: first try node_modules, then relative (for workspace dev)
+  let staticPath = options.staticPath
+  if (!staticPath) {
+    try {
+      // In npm: resolve from @blysspeak/prada-ui package
+      const uiPkg = await import.meta.resolve('@blysspeak/prada-ui')
+      staticPath = resolve(dirname(fileURLToPath(uiPkg)), 'dist')
+    } catch {
+      // In workspace: use relative path
+      staticPath = resolve(__dirname, '../../ui/dist')
+    }
+  }
   router.use(expressStatic(staticPath))
 
   router.get('*', (req, res) => {

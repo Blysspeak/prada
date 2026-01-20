@@ -90,11 +90,11 @@ Options:
 
 ## Integration
 
-For production apps, use `@prada/server` as Express middleware:
+For production apps, use `@blysspeak/prada-server` as Express middleware:
 
 ```javascript
 import express from 'express'
-import { createPradaServer } from '@prada/server'
+import { createPradaServer } from '@blysspeak/prada-server'
 import { PrismaClient } from '@prisma/client'
 
 const app = express()
@@ -146,7 +146,7 @@ pnpm build
 
 # Build specific package
 pnpm --filter @prada/ui build
-pnpm --filter @prada/server build
+pnpm --filter @blysspeak/prada-server build
 pnpm --filter @prada/core build
 pnpm --filter prada build
 ```

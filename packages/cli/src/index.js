@@ -118,8 +118,8 @@ generator client {
   // Step 4: Parse schema for PRADA
   consola.start('Initializing admin panel...')
 
-  const { parseSchema } = await import('@prada/core')
-  const { createPradaServer } = await import('@prada/server')
+  const { parseSchema } = await import('@blysspeak/prada-core')
+  const { createPradaServer } = await import('@blysspeak/prada-server')
 
   const schema = await parseSchema(schemaPath)
 

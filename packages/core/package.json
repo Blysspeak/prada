@@ -1,5 +1,5 @@
 {
-  "name": "@prada/core",
+  "name": "@blysspeak/prada-core",
   "version": "1.0.0",
   "description": "PRADA Core - Schema parser and API generator for Prisma",
   "type": "module",

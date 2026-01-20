@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { isConfigured, saveCredentials } from '@prada/core'
+import { isConfigured, saveCredentials } from '@blysspeak/prada-core'
 
 export function createSetupRoutes(cwd = process.cwd()) {
   const router = Router()

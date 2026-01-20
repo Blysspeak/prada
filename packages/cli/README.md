@@ -5,7 +5,7 @@
 ## Quick Start
 
 ```bash
-npx prada "postgresql://user:password@localhost:5432/mydb"
+npx @blysspeak/prada "postgresql://user:password@localhost:5432/mydb"
 ```
 
 That's it! PRADA will:
@@ -27,19 +27,19 @@ That's it! PRADA will:
 ### With database URL
 
 ```bash
-npx prada "postgresql://user:password@host:5432/database"
+npx @blysspeak/prada "postgresql://user:password@host:5432/database"
 ```
 
 ### With environment variable
 
 ```bash
-DATABASE_URL="postgresql://..." npx prada
+DATABASE_URL="postgresql://..." npx @blysspeak/prada
 ```
 
 ### Options
 
 ```bash
-npx prada --help
+npx @blysspeak/prada --help
 
 Options:
   -p, --port <port>  Server port (default: 3000)
@@ -49,14 +49,14 @@ Options:
 
 ## For Integration
 
-If you want to integrate PRADA into your existing project, use `@prada/server`:
+If you want to integrate PRADA into your existing project, use `@blysspeak/prada-server`:
 
 ```bash
-npm install @prada/server
+npm install @blysspeak/prada-server
 ```
 
 ```javascript
-import { createPradaServer } from '@prada/server'
+import { createPradaServer } from '@blysspeak/prada-server'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
