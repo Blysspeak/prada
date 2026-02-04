@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "description": "PRADA UI - React Admin Panel Interface",
   "type": "module",
-  "main": "./dist/index.html",
+  "main": "./dist/lib/index.js",
+  "module": "./dist/lib/index.js",
+  "types": "./dist/lib/index.d.ts",
   "exports": {
-    ".": "./dist/index.html",
-    "./dist/*": "./dist/*"
+    ".": {
+      "import": "./dist/lib/index.js",
+      "types": "./dist/lib/index.d.ts"
+    },
+    "./dist/*": "./dist/*",
+    "./styles.css": "./dist/lib/style.css"
   },
   "files": [
     "dist",
@@ -14,7 +20,9 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build && vite build --mode library && tsc --emitDeclarationOnly --outDir dist/lib",
+    "build:app": "vite build",
+    "build:lib": "vite build --mode library && tsc --emitDeclarationOnly --outDir dist/lib",
     "preview": "vite preview",
     "prepublishOnly": "npm run build"
   },

@@ -58,6 +58,9 @@ export const translations = {
     models: 'Модели',
     logout: 'Выйти',
     settings: 'Настройки',
+    dashboard: 'Дашборд',
+    tables: 'Таблицы',
+    database: 'База данных',
 
     // Login
     login: 'Вход',
@@ -143,6 +146,9 @@ export const translations = {
     models: 'Models',
     logout: 'Logout',
     settings: 'Settings',
+    dashboard: 'Dashboard',
+    tables: 'Tables',
+    database: 'Database',
 
     // Login
     login: 'Login',

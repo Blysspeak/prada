@@ -46,8 +46,9 @@ export interface PaginatedResponse<T> {
 }
 
 export interface User {
-  email: string
-  role: 'admin' | 'editor' | 'viewer'
+  email?: string
+  login?: string
+  role?: 'admin' | 'editor' | 'viewer'
 }
 
 export interface AuthState {

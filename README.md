@@ -5,15 +5,16 @@
 <h1 align="center">PRADA</h1>
 
 <p align="center">
-  <strong>Fast admin for your projects</strong><br>
-  Instant PostgreSQL database admin panel. Zero config.
+  <strong>PRisma ADmin — Modular admin panel for PostgreSQL</strong><br>
+  Use ready solution or build your own from primitives.
 </p>
 
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
-  <a href="#features">Features</a> •
-  <a href="#usage">Usage</a> •
-  <a href="#integration">Integration</a>
+  <a href="#architecture">Architecture</a> •
+  <a href="#customization">Customization</a> •
+  <a href="#api">API</a> •
+  <a href="docs/INTEGRATION.md">Integration Guide</a>
 </p>
 
 ---
@@ -21,156 +22,205 @@
 ## Quick Start
 
 ```bash
-# Clone the repository
-git clone https://github.com/blysspeak/prada.git
-cd prada
-
-# Install dependencies
-pnpm install
-
-# Build all packages
-pnpm build
-
-# Run with your database
-node packages/cli/dist/cli.js "postgresql://user:password@localhost:5432/mydb"
+npm install @blysspeak/prada @blysspeak/prada-ui
 ```
 
-Browser opens automatically at `http://localhost:3000/admin`.
-
-On first launch, you'll see a setup page to create admin credentials.
-
-## Features
-
-- **Zero config** — Just provide a database URL
-- **Auto schema detection** — Works with any PostgreSQL database
-- **Beautiful UI** — Modern dark theme with violet-cyan gradient
-- **Secure** — JWT auth, local credentials storage
-- **Fast** — Built with performance in mind
-- **Two modes** — CLI for quick access, middleware for integration
-
-## Requirements
-
-- Node.js 18+
-- pnpm 8+
-- PostgreSQL database
-
-## Usage
-
-### CLI Mode
-
-```bash
-# Basic usage
-node packages/cli/dist/cli.js "postgresql://user:pass@localhost:5432/mydb"
-
-# Custom port
-node packages/cli/dist/cli.js "postgresql://..." --port 8080
-
-# Using environment variable
-DATABASE_URL="postgresql://..." node packages/cli/dist/cli.js
-
-# Don't open browser
-node packages/cli/dist/cli.js "postgresql://..." --no-open
-```
-
-### CLI Options
-
-```
-prada [database-url] [options]
-
-Arguments:
-  database-url         PostgreSQL connection string
-                       Can also use DATABASE_URL env variable
-
-Options:
-  -p, --port <port>    Server port (default: 3000)
-  -H, --host <host>    Server host (default: localhost)
-  --no-open            Don't open browser automatically
-  -h, --help           Show help
-```
-
-## Integration
-
-For production apps, use `@blysspeak/prada-server` as Express middleware:
-
-```javascript
+```typescript
 import express from 'express'
-import { createPradaServer } from '@blysspeak/prada-server'
 import { PrismaClient } from '@prisma/client'
+import { createPradaServer } from '@blysspeak/prada'
 
 const app = express()
 const prisma = new PrismaClient()
 
-// Mount admin panel at /admin
-app.use('/admin', await createPradaServer({ prisma }))
+app.use('/admin', await createPradaServer({
+  prisma,
+  auth: { login: 'admin', password: 'secret' }
+}))
 
-app.listen(3000, () => {
-  console.log('Admin panel: http://localhost:3000/admin')
+app.listen(3000)
+```
+
+Open `http://localhost:3000/admin`
+
+## Architecture
+
+PRADA has 3 abstraction levels — use what fits your needs:
+
+| Level | API | Use Case |
+|-------|-----|----------|
+| **3** | `createPradaServer()` | Ready solution, zero config |
+| **2** | Routes, Middleware, Handlers | Custom server assembly |
+| **1** | Query builders, JWT, Sanitizers | Build from scratch |
+
+## Level 3: Ready Solution
+
+```typescript
+app.use('/admin', await createPradaServer({
+  prisma,
+  auth: { login: 'admin', password: 'secret' },
+
+  hooks: {
+    'User.beforeCreate': async (data) => ({ ...data, createdAt: new Date() }),
+    '*.afterDelete': async (id, ctx) => console.log(`Deleted ${ctx.model}:${id}`)
+  },
+
+  models: {
+    User: {
+      actions: ['read', 'update'],
+      fields: { password: { hidden: true } }
+    }
+  }
+}))
+```
+
+## Level 2: Building Blocks
+
+```typescript
+import {
+  parseSchema,
+  createApiHandler,
+  createCrudRoutes,
+  createAuthService,
+  createAuthMiddleware,
+  createAuthRoutes
+} from '@blysspeak/prada'
+
+const router = Router()
+const schema = await parseSchema()
+const api = createApiHandler(prisma, schema)
+const auth = createAuthService({ login: 'admin', password: 'secret' })
+
+router.get('/api/stats', myStatsHandler)  // Custom route
+router.use('/api/auth', createAuthRoutes(auth))
+router.use('/api', createAuthMiddleware(auth), createCrudRoutes(api))
+```
+
+## Level 1: Primitives
+
+```typescript
+import {
+  // Schema
+  parseSchema, getModels, getEnums, getRelations,
+
+  // Query
+  buildWhereClause, buildOrderByClause, buildIncludeClause,
+
+  // Data
+  sanitizeInput, parseId, convertFieldValue,
+
+  // Auth
+  generateToken, verifyToken, hashPassword, comparePassword
+} from '@blysspeak/prada'
+
+const where = buildWhereClause(model, search, filters)
+const users = await prisma.user.findMany({ where, take: 50 })
+```
+
+## UI Components
+
+```typescript
+import {
+  // Pages
+  LoginPage, DashboardPage, ModelListPage, ModelFormPage, ModelViewPage,
+
+  // Components
+  DataTable, DynamicForm, Layout, Sidebar,
+
+  // Fields
+  TextField, NumberField, BooleanField, DateTimeField, EnumField, JsonField,
+
+  // Providers
+  AuthProvider, SchemaProvider, useAuth, useSchema, useSettings
+} from '@blysspeak/prada-ui'
+
+function CustomPage() {
+  const schema = useSchema()
+  return <DataTable data={records} columns={schema.models.User.fields} />
+}
+```
+
+## Customization
+
+### Hooks
+
+```typescript
+createApiHandler(prisma, schema, {
+  hooks: {
+    '*': {  // All models
+      beforeCreate: async (data, ctx) => data,
+      afterCreate: async (record, ctx) => {},
+      beforeUpdate: async (id, data, ctx) => data,
+      afterUpdate: async (record, ctx) => {},
+      beforeDelete: async (id, ctx) => {},
+      afterDelete: async (id, ctx) => {},
+      beforeFind: async (query, ctx) => query,
+      afterFind: async (records, ctx) => records
+    },
+    User: {  // Specific model
+      beforeCreate: async (data) => ({
+        ...data, password: await hashPassword(data.password)
+      })
+    }
+  }
 })
 ```
 
-## Authentication
+### Model Config
 
-### First Launch
-
-On first launch, PRADA shows a setup page where you create admin credentials.
-Credentials are stored locally in `.prada/credentials`.
-
-### Environment Variables
-
-Skip setup by providing credentials via env:
-
-```bash
-PRADA_LOGIN=admin PRADA_PASSWORD=secret node packages/cli/dist/cli.js "postgresql://..."
+```typescript
+createApiHandler(prisma, schema, {
+  models: {
+    User: {
+      actions: ['read'],  // read-only
+      defaultSort: { field: 'createdAt', order: 'desc' },
+      fields: {
+        password: { hidden: true },
+        email: { readonly: true },
+        name: { label: 'Full Name' }
+      }
+    }
+  }
+})
 ```
 
-## Project Structure
+## API Endpoints
 
-```
-prada/
-├── packages/
-│   ├── cli/      # CLI entry point
-│   ├── core/     # Schema parser, API generator
-│   ├── server/   # Express middleware
-│   └── ui/       # React frontend
-└── assets/       # Logo and images
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/schema` | Schema metadata |
+| GET | `/api/:model` | List with pagination |
+| GET | `/api/:model/:id` | Single record |
+| POST | `/api/:model` | Create |
+| PUT | `/api/:model/:id` | Update |
+| DELETE | `/api/:model/:id` | Delete |
+
+**Query params:** `?page=1&limit=20&sort=name&order=asc&search=john&include=posts`
+
+## Types
+
+```typescript
+import type {
+  Schema, Model, Field, Enum,
+  PrismaClient, ApiHandler,
+  CrudHooks, ModelConfig,
+  FindManyParams, PaginatedResponse
+} from '@blysspeak/prada'
 ```
 
 ## Development
 
 ```bash
-# Install dependencies
 pnpm install
-
-# Build all packages
 pnpm build
-
-# Build specific package
-pnpm --filter @prada/ui build
-pnpm --filter @blysspeak/prada-server build
-pnpm --filter @prada/core build
-pnpm --filter prada build
+pnpm dev  # Watch mode
 ```
 
-## Supported Features
+## Requirements
 
-| Feature | Status |
-|---------|--------|
-| PostgreSQL | ✅ |
-| MySQL | 🔜 |
-| SQLite | 🔜 |
-| CRUD operations | ✅ |
-| Relations | ✅ |
-| Search & filters | ✅ |
-| Pagination | ✅ |
-| Sorting | ✅ |
-| Dark/Light theme | ✅ |
-
-## Tech Stack
-
-- **Frontend**: React 18, Vite, TailwindCSS
-- **Backend**: Express, Prisma
-- **CLI**: citty, consola, picocolors
-- **Auth**: JWT + bcrypt
+- Node.js 18+
+- PostgreSQL
+- Prisma schema
 
 ## License
 
