@@ -133,10 +133,16 @@ export async function createPradaServer(
   // Working directory for config files
   const cwd = options.cwd || process.cwd()
 
-  // Get auth service (cached for performance)
-  const getAuthService = () => options.auth
-    ? createAuthService(options.auth)
-    : createAuthServiceFromConfig(loadConfig(cwd))
+  // Create auth service once (singleton)
+  let _authService: ReturnType<typeof createAuthService> | null = null
+  const getAuthService = () => {
+    if (!_authService) {
+      _authService = options.auth
+        ? createAuthService(options.auth)
+        : createAuthServiceFromConfig(loadConfig(cwd))
+    }
+    return _authService
+  }
 
   // Check if configured
   const isReady = () => options.auth || loadConfig(cwd).auth
