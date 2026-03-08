@@ -79,7 +79,8 @@ export {
   DashboardPage,
   ModelListPage,
   ModelFormPage,
-  ModelViewPage
+  ModelViewPage,
+  AuditLogPage
 } from './pages'
 
 // =============================================================================
@@ -89,6 +90,9 @@ export {
 // Data display
 export { DataTable, Pagination } from './components/DataTable'
 export { CellValue } from './components/DataTable/CellValue'
+export { ColumnPicker } from './components/DataTable/ColumnPicker'
+export { ExportButton } from './components/DataTable/ExportButton'
+export { InlineEditor } from './components/DataTable/InlineEditor'
 
 // Forms
 export { DynamicForm } from './components/Form'
@@ -99,6 +103,21 @@ export { Layout, Sidebar } from './components/Layout'
 
 // Settings
 export { SettingsModal, AnimatedThemeToggler } from './components/Settings'
+
+// Filters
+export { FilterPanel, FilterField } from './components/Filters'
+
+// Search
+export { GlobalSearch, SearchHighlight } from './components/Search'
+
+// Keyboard shortcuts
+export { ShortcutsHelp } from './components/KeyboardShortcuts'
+
+// Audit
+export { ChangesDiff } from './components/Audit'
+
+// Dashboard
+export { ModelStatsCard, QuickActions, RecentActivity } from './components/Dashboard'
 
 // UI primitives
 export { BorderBeam } from './components/ui/BorderBeam'
@@ -114,7 +133,9 @@ export {
   BooleanField,
   DateTimeField,
   EnumField,
-  JsonField
+  JsonField,
+  RelationField,
+  RelationListField
 } from './components/Fields'
 
 // =============================================================================
@@ -141,6 +162,15 @@ export { SetupProvider, useSetup } from './providers/SetupProvider'
 export { useTranslation, pluralize } from './i18n/useTranslation'
 
 // =============================================================================
+// HOOKS - Additional custom hooks
+// =============================================================================
+
+export { useColumnConfig } from './hooks/useColumnConfig'
+export { useGlobalSearch } from './hooks/useGlobalSearch'
+export { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
+export { useRelationOptions } from './hooks/useRelationOptions'
+
+// =============================================================================
 // API CLIENT - HTTP client for PRADA backend
 // =============================================================================
 
@@ -165,6 +195,7 @@ export type {
 // =============================================================================
 
 export { cn } from './lib/utils'
+export { exportToCSV, exportToJSON } from './lib/export'
 
 // =============================================================================
 // I18N - Internationalization

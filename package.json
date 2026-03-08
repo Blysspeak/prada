@@ -10,10 +10,6 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    },
-    "./ui": {
-      "import": "@blysspeak/prada-ui",
-      "types": "@blysspeak/prada-ui"
     }
   },
   "files": [
@@ -56,6 +52,9 @@
   },
   "peerDependencies": {
     "@prisma/client": ">=5.0.0"
+  },
+  "optionalDependencies": {
+    "@blysspeak/prada-ui": "^1.0.0"
   },
   "publishConfig": {
     "access": "public"

@@ -1,2 +1,5 @@
 export { DataTable } from './DataTable'
 export { Pagination } from './Pagination'
+export { ColumnPicker } from './ColumnPicker'
+export { ExportButton } from './ExportButton'
+export { InlineEditor } from './InlineEditor'
