@@ -49,7 +49,12 @@
 // LEVEL 3: READY SOLUTION
 // =============================================================================
 
-export { createPradaServer, type PradaServerOptions } from './server.js'
+export {
+  createPradaServer,
+  type PradaServerOptions,
+  type PradaContext,
+  type PradaModule
+} from './server.js'
 
 // =============================================================================
 // LEVEL 2: BUILDING BLOCKS
@@ -76,6 +81,9 @@ export { loadConfig, isConfigured, saveCredentials, deleteCredentials } from './
 // --- UI ---
 export { resolveUIPath, serveUI, createSpaHandler, uiFilesExist } from './ui/serve.js'
 
+// --- Audit ---
+export { createAuditStore, createAuditHooks, createAuditRoutes } from './audit/index.js'
+
 // =============================================================================
 // LEVEL 1: PRIMITIVES
 // =============================================================================
@@ -99,7 +107,10 @@ export {
   createFindOne,
   createCreate,
   createUpdate,
-  createDelete
+  createDelete,
+  createBulkDelete,
+  createBulkUpdate,
+  createStats
 } from './api/operations/index.js'
 
 // --- Query builder utilities ---

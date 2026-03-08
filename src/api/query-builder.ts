@@ -6,6 +6,17 @@
 
 import type { Model, Field } from '../schema/types.js'
 import { getSearchableFields } from '../schema/index.js'
+import { convertFieldValue } from './sanitizer.js'
+
+/** Supported filter operators */
+const FILTER_OPERATORS = [
+  'contains', 'startsWith', 'endsWith',
+  'gte', 'lte', 'gt', 'lt',
+  'in', 'not', 'null'
+] as const
+
+/** String operators that use case-insensitive mode */
+const STRING_OPERATORS = new Set(['contains', 'startsWith', 'endsWith'])
 
 /**
  * Build a Prisma where clause from search and filter parameters
@@ -36,9 +47,21 @@ export function buildWhereClause(
   // Add filter clauses
   if (filters) {
     Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        where[key] = value
+      if (value === undefined || value === null || value === '') return
+
+      // Check for operator suffix (e.g., field__contains)
+      const operatorMatch = key.match(/^(.+)__(\w+)$/)
+      if (operatorMatch) {
+        const [, fieldName, operator] = operatorMatch
+        if (FILTER_OPERATORS.includes(operator as typeof FILTER_OPERATORS[number])) {
+          const field = model.fields.find(f => f.name === fieldName)
+          where[fieldName] = buildOperatorFilter(operator, value, field)
+          return
+        }
       }
+
+      // Plain exact match (backward compatible)
+      where[key] = value
     })
   }
 
@@ -153,4 +176,39 @@ export function parsePagination(
     page: actualPage,
     limit: actualLimit
   }
+}
+
+/**
+ * Build a Prisma filter object for a given operator
+ */
+function buildOperatorFilter(
+  operator: string,
+  value: unknown,
+  field?: Field
+): unknown {
+  const strValue = String(value)
+  const fieldType = field?.type
+
+  // String operators: contains, startsWith, endsWith
+  if (STRING_OPERATORS.has(operator)) {
+    return { [operator]: strValue, mode: 'insensitive' }
+  }
+
+  // Null check
+  if (operator === 'null') {
+    return strValue === 'true' ? null : { not: null }
+  }
+
+  // In operator: split by comma and convert each value
+  if (operator === 'in') {
+    const values = strValue.split(',').map(v => {
+      const trimmed = v.trim()
+      return fieldType ? convertFieldValue(fieldType, trimmed) : trimmed
+    })
+    return { in: values }
+  }
+
+  // Comparison and not operators: convert value based on field type
+  const converted = fieldType ? convertFieldValue(fieldType, strValue) : strValue
+  return { [operator]: converted }
 }

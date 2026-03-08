@@ -25,6 +25,11 @@
     "build": "pnpm build:main && pnpm build:ui",
     "build:main": "tsup",
     "build:ui": "pnpm --filter @blysspeak/prada-ui build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "pnpm --filter @blysspeak/prada-ui test",
+    "test:all": "pnpm test && pnpm test:ui",
+    "test:coverage": "vitest run --coverage",
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
@@ -42,8 +47,12 @@
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.10.0",
+    "@types/supertest": "^7.2.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "supertest": "^7.2.2",
     "tsup": "^8.3.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.0.18"
   },
   "peerDependencies": {
     "@prisma/client": ">=5.0.0"

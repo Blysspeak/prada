@@ -39,7 +39,9 @@ export type {
   ModelHooks,
   CrudHooks,
   ApiHandlerOptions,
-  ApiHandler
+  ApiHandler,
+  ModelStats,
+  StatsResponse
 } from './api/types.js'
 
 // Auth types
@@ -54,4 +56,7 @@ export type {
 } from './auth/types.js'
 
 // Server types
-export type { PradaServerOptions } from './server.js'
+export type { PradaServerOptions, PradaContext, PradaModule } from './server.js'
+
+// Audit types
+export type { AuditEntry, AuditChange, AuditStore, AuditOptions } from './audit/types.js'

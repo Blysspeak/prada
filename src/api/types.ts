@@ -26,6 +26,8 @@ export interface PrismaClient {
     create: (args: Pick<PrismaQueryArgs, 'data'>) => Promise<Record<string, unknown>>
     update: (args: Pick<PrismaQueryArgs, 'where' | 'data'>) => Promise<Record<string, unknown>>
     delete: (args: Pick<PrismaQueryArgs, 'where'>) => Promise<Record<string, unknown>>
+    deleteMany: (args?: Pick<PrismaQueryArgs, 'where'>) => Promise<{ count: number }>
+    updateMany: (args: Pick<PrismaQueryArgs, 'where' | 'data'>) => Promise<{ count: number }>
   }
 }
 
@@ -174,6 +176,18 @@ export interface ApiHandlerOptions {
   hooks?: CrudHooks
 }
 
+/** Stats response for a single model */
+export interface ModelStats {
+  name: string
+  count: number
+  recentCount?: number
+}
+
+/** Stats response */
+export interface StatsResponse {
+  models: ModelStats[]
+}
+
 /** API Handler interface */
 export interface ApiHandler {
   findMany: (modelName: string, params?: FindManyParams) => Promise<PaginatedResponse>
@@ -181,5 +195,8 @@ export interface ApiHandler {
   create: (modelName: string, data: Record<string, unknown>) => Promise<Record<string, unknown>>
   update: (modelName: string, id: string | number, data: Record<string, unknown>) => Promise<Record<string, unknown>>
   remove: (modelName: string, id: string | number) => Promise<Record<string, unknown>>
+  bulkDelete: (modelName: string, ids: (string | number)[]) => Promise<{ count: number }>
+  bulkUpdate: (modelName: string, ids: (string | number)[], data: Record<string, unknown>) => Promise<{ count: number }>
+  getStats: () => Promise<StatsResponse>
   getSchema: () => Schema
 }

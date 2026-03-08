@@ -17,6 +17,9 @@ import { createFindOne } from './operations/findOne.js'
 import { createCreate } from './operations/create.js'
 import { createUpdate } from './operations/update.js'
 import { createDelete } from './operations/delete.js'
+import { createBulkDelete } from './operations/bulkDelete.js'
+import { createBulkUpdate } from './operations/bulkUpdate.js'
+import { createStats } from './operations/stats.js'
 
 /**
  * Create an API handler for CRUD operations
@@ -57,6 +60,15 @@ export function createApiHandler(
 
     remove: (model, id) =>
       createDelete({ ...ctx, config: models[model] })(model, id),
+
+    bulkDelete: (model, ids) =>
+      createBulkDelete({ ...ctx, config: models[model] })(model, ids),
+
+    bulkUpdate: (model, ids, data) =>
+      createBulkUpdate({ ...ctx, config: models[model] })(model, ids, data),
+
+    getStats: () =>
+      createStats({ prisma, schema })(),
 
     getSchema: () => schema
   }

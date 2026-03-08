@@ -50,6 +50,8 @@ export interface Field {
   relationOnDelete?: string
   /** Enum values if this is an enum field */
   enumValues?: string[]
+  /** Related model name if this is a relation field */
+  relatedModel?: string
 }
 
 /** Represents a Prisma model */

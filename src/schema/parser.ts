@@ -2,12 +2,12 @@
  * Prisma Schema Parser
  *
  * Parses Prisma schema files into a structured format using @prisma/internals.
- * This module provides both high-level (parseSchema) and low-level (parseDMMF) APIs.
+ * Supports both single files and directories of .prisma files.
  */
 
 import prismaInternals from '@prisma/internals'
-import { readFileSync, existsSync } from 'fs'
-import { resolve } from 'path'
+import { readFileSync, existsSync, statSync, readdirSync } from 'fs'
+import { resolve, join } from 'path'
 import type { Schema, Model, Field, Enum, FieldType } from './types.js'
 
 const { getDMMF } = prismaInternals
@@ -26,25 +26,29 @@ const PRISMA_TO_JS_TYPES: Record<string, FieldType> = {
 }
 
 /**
- * Parse a Prisma schema file
+ * Parse a Prisma schema file or directory of .prisma files
  *
- * @param schemaPath - Path to schema.prisma file. If not provided, searches common locations.
+ * @param schemaPath - Path to schema.prisma file or directory containing .prisma files.
+ *                     If not provided, searches common locations.
  * @returns Parsed schema with models and enums
  *
  * @example
  * ```typescript
+ * // Single file
  * const schema = await parseSchema('./prisma/schema.prisma')
- * console.log(schema.models) // [{ name: 'User', fields: [...] }, ...]
+ *
+ * // Directory of .prisma files (modular schema)
+ * const schema = await parseSchema('./prisma/schema')
  * ```
  */
 export async function parseSchema(schemaPath?: string): Promise<Schema> {
   const path = resolveSchemaPath(schemaPath)
 
   if (!existsSync(path)) {
-    throw new Error(`Schema file not found: ${path}`)
+    throw new Error(`Schema path not found: ${path}`)
   }
 
-  const schemaContent = readFileSync(path, 'utf-8')
+  const schemaContent = readSchemaContent(path)
   return parseDMMF(schemaContent)
 }
 
@@ -53,17 +57,6 @@ export async function parseSchema(schemaPath?: string): Promise<Schema> {
  *
  * @param schemaContent - Raw Prisma schema content
  * @returns Parsed schema with models and enums
- *
- * @example
- * ```typescript
- * const schemaContent = `
- *   model User {
- *     id    Int    @id
- *     name  String
- *   }
- * `
- * const schema = await parseDMMF(schemaContent)
- * ```
  */
 export async function parseDMMF(schemaContent: string): Promise<Schema> {
   const dmmf = await getDMMF({ datamodel: schemaContent })
@@ -79,6 +72,38 @@ export async function parseDMMF(schemaContent: string): Promise<Schema> {
 }
 
 /**
+ * Read schema content from a file or directory.
+ * If the path is a directory, reads all .prisma files and concatenates them.
+ */
+function readSchemaContent(schemaPath: string): string {
+  const stat = statSync(schemaPath)
+
+  if (stat.isDirectory()) {
+    return readSchemaDirectory(schemaPath)
+  }
+
+  return readFileSync(schemaPath, 'utf-8')
+}
+
+/**
+ * Read all .prisma files from a directory and concatenate them.
+ * Files are sorted alphabetically for consistent ordering.
+ */
+function readSchemaDirectory(dirPath: string): string {
+  const files = readdirSync(dirPath)
+    .filter(f => f.endsWith('.prisma'))
+    .sort()
+
+  if (files.length === 0) {
+    throw new Error(`No .prisma files found in directory: ${dirPath}`)
+  }
+
+  return files
+    .map(f => readFileSync(join(dirPath, f), 'utf-8'))
+    .join('\n\n')
+}
+
+/**
  * Resolve schema path, searching common locations if not provided
  */
 function resolveSchemaPath(customPath?: string): string {
@@ -88,6 +113,7 @@ function resolveSchemaPath(customPath?: string): string {
 
   const possiblePaths = [
     'prisma/schema.prisma',
+    'prisma/schema',            // directory of .prisma files
     'schema.prisma',
     'src/prisma/schema.prisma'
   ]
@@ -174,9 +200,11 @@ function parseField(field: RawField, enumNames: Set<string>, enums: Enum[]): Fie
   const isEnum = enumNames.has(field.type)
   const enumDef = isEnum ? enums.find(e => e.name === field.type) : undefined
 
+  const fieldType = getFieldType(field.type, isEnum)
+
   return {
     name: field.name,
-    type: getFieldType(field.type, isEnum),
+    type: fieldType,
     isRequired: field.isRequired,
     isList: field.isList,
     isUnique: field.isUnique,
@@ -189,7 +217,8 @@ function parseField(field: RawField, enumNames: Set<string>, enums: Enum[]): Fie
     relationFromFields: field.relationFromFields,
     relationToFields: field.relationToFields,
     relationOnDelete: field.relationOnDelete,
-    enumValues: enumDef?.values
+    enumValues: enumDef?.values,
+    relatedModel: fieldType === 'relation' ? field.type : undefined
   }
 }
 

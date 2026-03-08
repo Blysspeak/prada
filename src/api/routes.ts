@@ -43,6 +43,76 @@ export function createCrudRoutes(apiHandler: ApiHandler): Router {
     return res.json(schema)
   })
 
+  // Get stats for all models
+  router.get('/stats', async (_req: Request, res: Response) => {
+    try {
+      const result = await apiHandler.getStats()
+      return res.json(result)
+    } catch (error) {
+      const err = error as Error
+      console.error('Stats error:', err)
+      return res.status(500).json({
+        error: err.message || 'Internal server error'
+      })
+    }
+  })
+
+  // Bulk delete records
+  router.delete('/:model/bulk', async (req: Request, res: Response) => {
+    try {
+      const model = getParam(req.params, 'model')
+      const { ids } = req.body
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ error: 'ids must be a non-empty array' })
+      }
+
+      const result = await apiHandler.bulkDelete(model, ids)
+      return res.json({ success: true, count: result.count })
+    } catch (error) {
+      const err = error as Error & { code?: string }
+      console.error('Bulk delete error:', err)
+
+      if (err.message?.includes('not allowed')) {
+        return res.status(403).json({ error: err.message })
+      }
+
+      return res.status(err.message?.includes('not found') ? 404 : 500).json({
+        error: err.message || 'Internal server error'
+      })
+    }
+  })
+
+  // Bulk update records
+  router.put('/:model/bulk', async (req: Request, res: Response) => {
+    try {
+      const model = getParam(req.params, 'model')
+      const { ids, data } = req.body
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ error: 'ids must be a non-empty array' })
+      }
+
+      if (!data || typeof data !== 'object') {
+        return res.status(400).json({ error: 'data must be an object' })
+      }
+
+      const result = await apiHandler.bulkUpdate(model, ids, data)
+      return res.json({ success: true, count: result.count })
+    } catch (error) {
+      const err = error as Error & { code?: string }
+      console.error('Bulk update error:', err)
+
+      if (err.message?.includes('not allowed')) {
+        return res.status(403).json({ error: err.message })
+      }
+
+      return res.status(err.message?.includes('not found') ? 404 : 500).json({
+        error: err.message || 'Internal server error'
+      })
+    }
+  })
+
   // List records
   router.get('/:model', async (req: Request, res: Response) => {
     try {
