@@ -85,7 +85,94 @@ export const translations = {
     refreshInterval: 'Интервал (сек)',
     dateFormat: 'Формат даты',
     relative: 'Относительный',
-    reset: 'Сбросить настройки'
+    reset: 'Сбросить настройки',
+
+    // Filters
+    filters: 'Фильтры',
+    clearFilters: 'Очистить',
+    addFilter: 'Добавить фильтр',
+    contains: 'Содержит',
+    equals: 'Равно',
+    startsWith: 'Начинается с',
+    greaterThan: 'Больше',
+    lessThan: 'Меньше',
+    between: 'Между',
+    anyValue: 'Любое',
+    from: 'От',
+    to: 'До',
+    min: 'Мин',
+    max: 'Макс',
+    activeFilters: 'Активные фильтры',
+
+    // Column customization
+    columns: 'Столбцы',
+    showHideColumns: 'Показать/скрыть столбцы',
+    resetColumns: 'Сбросить',
+    moveUp: 'Вверх',
+    moveDown: 'Вниз',
+
+    // Keyboard shortcuts
+    keyboardShortcuts: 'Горячие клавиши',
+    shortcutNewRecord: 'Создать запись',
+    shortcutSave: 'Сохранить',
+    shortcutCancel: 'Отмена',
+    shortcutSearch: 'Поиск',
+    shortcutRefresh: 'Обновить',
+    shortcutNavigate: 'Навигация',
+    shortcutView: 'Просмотр записи',
+    shortcutEdit: 'Редактировать',
+
+    // Relations
+    searchRelation: 'Поиск...',
+    noOptionsFound: 'Ничего не найдено',
+    relatedRecords: 'Связанные записи',
+    selectRelation: 'Выберите...',
+    viewAll: 'Показать все',
+
+    // Export
+    export: 'Экспорт',
+    exportCSV: 'Экспорт CSV',
+    exportJSON: 'Экспорт JSON',
+    exportAll: 'Экспорт всех',
+    exporting: 'Экспорт...',
+
+    // Dashboard
+    totalRecords: 'Всего записей',
+    recentActivity: 'Последняя активность',
+    quickActions: 'Быстрые действия',
+    noRecentActivity: 'Нет последних изменений',
+    today: 'сегодня',
+    createNew: 'Создать {model}',
+    recordsToday: 'за сегодня',
+
+    // Global search
+    globalSearch: 'Глобальный поиск',
+    searchAllModels: 'Поиск по всем моделям...',
+    noSearchResults: 'Ничего не найдено',
+    pressEscToClose: 'Нажмите Esc для закрытия',
+    openSearch: 'Открыть поиск',
+    typeToSearch: 'Введите для поиска...',
+
+    // Inline editing
+    doubleClickToEdit: 'Двойной клик для редактирования',
+    inlineEditSaved: 'Сохранено',
+    pressEnterToSave: 'Enter для сохранения',
+    pressEscToCancel: 'Esc для отмены',
+
+    // Audit
+    auditLog: 'Журнал изменений',
+    timestamp: 'Время',
+    action: 'Действие',
+    changes: 'Изменения',
+    created: 'Создано',
+    updated: 'Обновлено',
+    deleted: 'Удалено',
+    oldValue: 'Было',
+    newValue: 'Стало',
+    noChanges: 'Нет изменений',
+    allModels: 'Все модели',
+    allActions: 'Все действия',
+    recordHistory: 'История записи'
   },
   en: {
     // Common
@@ -173,7 +260,94 @@ export const translations = {
     refreshInterval: 'Interval (sec)',
     dateFormat: 'Date format',
     relative: 'Relative',
-    reset: 'Reset settings'
+    reset: 'Reset settings',
+
+    // Filters
+    filters: 'Filters',
+    clearFilters: 'Clear',
+    addFilter: 'Add filter',
+    contains: 'Contains',
+    equals: 'Equals',
+    startsWith: 'Starts with',
+    greaterThan: 'Greater than',
+    lessThan: 'Less than',
+    between: 'Between',
+    anyValue: 'Any',
+    from: 'From',
+    to: 'To',
+    min: 'Min',
+    max: 'Max',
+    activeFilters: 'Active filters',
+
+    // Column customization
+    columns: 'Columns',
+    showHideColumns: 'Show/hide columns',
+    resetColumns: 'Reset',
+    moveUp: 'Move up',
+    moveDown: 'Move down',
+
+    // Keyboard shortcuts
+    keyboardShortcuts: 'Keyboard shortcuts',
+    shortcutNewRecord: 'New record',
+    shortcutSave: 'Save',
+    shortcutCancel: 'Cancel',
+    shortcutSearch: 'Search',
+    shortcutRefresh: 'Refresh',
+    shortcutNavigate: 'Navigate',
+    shortcutView: 'View record',
+    shortcutEdit: 'Edit',
+
+    // Relations
+    searchRelation: 'Search...',
+    noOptionsFound: 'No options found',
+    relatedRecords: 'Related records',
+    selectRelation: 'Select...',
+    viewAll: 'View all',
+
+    // Export
+    export: 'Export',
+    exportCSV: 'Export CSV',
+    exportJSON: 'Export JSON',
+    exportAll: 'Export all',
+    exporting: 'Exporting...',
+
+    // Dashboard
+    totalRecords: 'Total records',
+    recentActivity: 'Recent activity',
+    quickActions: 'Quick actions',
+    noRecentActivity: 'No recent activity',
+    today: 'today',
+    createNew: 'Create {model}',
+    recordsToday: 'today',
+
+    // Global search
+    globalSearch: 'Global search',
+    searchAllModels: 'Search all models...',
+    noSearchResults: 'No results found',
+    pressEscToClose: 'Press Esc to close',
+    openSearch: 'Open search',
+    typeToSearch: 'Type to search...',
+
+    // Inline editing
+    doubleClickToEdit: 'Double-click to edit',
+    inlineEditSaved: 'Saved',
+    pressEnterToSave: 'Press Enter to save',
+    pressEscToCancel: 'Press Esc to cancel',
+
+    // Audit
+    auditLog: 'Audit Log',
+    timestamp: 'Time',
+    action: 'Action',
+    changes: 'Changes',
+    created: 'Created',
+    updated: 'Updated',
+    deleted: 'Deleted',
+    oldValue: 'Old',
+    newValue: 'New',
+    noChanges: 'No changes',
+    allModels: 'All models',
+    allActions: 'All actions',
+    recordHistory: 'Record history'
   }
 } as const
 

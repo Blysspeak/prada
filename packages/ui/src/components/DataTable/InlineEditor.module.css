@@ -1,0 +1,40 @@
+.editor {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb, 59, 130, 246), 0.2);
+}
+
+.input:focus {
+  border-color: var(--primary);
+}
+
+.textarea {
+  composes: input;
+  min-height: 60px;
+  resize: vertical;
+}
+
+.select {
+  composes: input;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}

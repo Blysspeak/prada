@@ -56,3 +56,19 @@ export interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
 }
+
+export interface AuditChange {
+  field: string
+  oldValue: unknown
+  newValue: unknown
+}
+
+export interface AuditEntry {
+  id: string
+  model: string
+  recordId: string | number
+  action: 'create' | 'update' | 'delete'
+  changes: AuditChange[]
+  userId?: string
+  timestamp: string
+}

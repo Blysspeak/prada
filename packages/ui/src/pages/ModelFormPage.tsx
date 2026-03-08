@@ -1,10 +1,13 @@
+import { useMemo, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft } from 'lucide-react'
 import { useSchema } from '@/providers/SchemaProvider'
+import { usePrada } from '@/customization'
 import { useTranslation } from '@/i18n'
 import { api } from '@/api'
 import { DynamicForm } from '@/components/Form'
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import styles from './ModelFormPage.module.css'
 
 export function ModelFormPage() {
@@ -13,10 +16,25 @@ export function ModelFormPage() {
   const queryClient = useQueryClient()
   const { getModel } = useSchema()
   const { t } = useTranslation()
+  const { pages, slots } = usePrada()
 
   const isEdit = !!id
   const model = getModel(modelName || '')
   const actualModelName = model?.name || modelName || ''
+
+  const navigateBack = useCallback(() => {
+    navigate(`/models/${modelName}`)
+  }, [navigate, modelName])
+
+  useKeyboardShortcuts(useMemo(() => [
+    { key: 'escape', handler: navigateBack, description: t('shortcutCancel') }
+  ], [navigateBack, t]))
+
+  // If there's a custom page override for modelForm, use it
+  if (pages?.modelForm && model) {
+    const CustomPage = pages.modelForm
+    return <CustomPage model={model} id={id} />
+  }
 
   const { data: recordData, isLoading: isLoadingRecord } = useQuery({
     queryKey: ['model', actualModelName, id],
@@ -66,6 +84,9 @@ export function ModelFormPage() {
   const isLoading = createMutation.isPending || updateMutation.isPending
   const error = createMutation.error || updateMutation.error
 
+  const FormHeader = slots?.formHeader
+  const FormFooter = slots?.formFooter
+
   return (
     <div className={styles.page}>
       <button
@@ -87,6 +108,8 @@ export function ModelFormPage() {
           </div>
         )}
 
+        {FormHeader && <FormHeader model={model} isEdit={isEdit} />}
+
         <DynamicForm
           model={model}
           initialData={isEdit ? recordData?.data : undefined}
@@ -95,6 +118,8 @@ export function ModelFormPage() {
           isLoading={isLoading}
           isEdit={isEdit}
         />
+
+        {FormFooter && <FormFooter model={model} isEdit={isEdit} />}
       </div>
     </div>
   )

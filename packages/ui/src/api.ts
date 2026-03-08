@@ -1,4 +1,4 @@
-import type { PradaSchema, PaginatedResponse, User } from './types'
+import type { PradaSchema, PaginatedResponse, User, AuditEntry } from './types'
 
 const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, '') || ''
 const API_BASE = `${baseUrl}/api`
@@ -118,6 +118,40 @@ export const api = {
 
     async delete(modelName: string, id: string | number): Promise<{ success: boolean }> {
       return request(`/${modelName}/${id}`, { method: 'DELETE' })
+    },
+
+    async bulkDelete(modelName: string, ids: (string | number)[]): Promise<{ count: number }> {
+      return request(`/${modelName}/bulk`, { method: 'DELETE', body: JSON.stringify({ ids }) })
+    },
+
+    async bulkUpdate(modelName: string, ids: (string | number)[], data: Record<string, unknown>): Promise<{ count: number }> {
+      return request(`/${modelName}/bulk`, { method: 'PUT', body: JSON.stringify({ ids, data }) })
+    }
+  },
+
+  stats: {
+    async get(): Promise<{ models: { name: string; count: number; recentCount: number }[] }> {
+      return request('/stats')
+    }
+  },
+
+  audit: {
+    async list(params?: { limit?: number; offset?: number; model?: string; action?: string }): Promise<{ entries: AuditEntry[]; total: number }> {
+      const searchParams = new URLSearchParams()
+      if (params?.limit) searchParams.set('limit', String(params.limit))
+      if (params?.offset) searchParams.set('offset', String(params.offset))
+      if (params?.model) searchParams.set('model', params.model)
+      if (params?.action) searchParams.set('action', params.action)
+      const query = searchParams.toString()
+      return request(`/audit${query ? `?${query}` : ''}`)
+    },
+
+    async byModel(model: string, limit?: number): Promise<AuditEntry[]> {
+      return request(`/audit/${model}${limit ? `?limit=${limit}` : ''}`)
+    },
+
+    async byRecord(model: string, id: string | number): Promise<AuditEntry[]> {
+      return request(`/audit/${model}/${id}`)
     }
   }
 }

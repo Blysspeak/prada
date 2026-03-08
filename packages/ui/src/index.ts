@@ -1,31 +1,73 @@
 /**
  * @blysspeak/prada-ui
  *
- * React components and pages for PRADA admin panel.
- *
- * This package provides:
- * - Ready-to-use pages (LoginPage, DashboardPage, ModelListPage, etc.)
- * - Reusable components (DataTable, DynamicForm, Layout, etc.)
- * - Form fields (TextField, NumberField, BooleanField, etc.)
- * - Providers (AuthProvider, SchemaProvider, SettingsProvider, etc.)
- * - Hooks (useAuth, useSchema, useSettings, useTranslation)
- * - API client for PRADA backend
- * - Utility functions (cn, formatDate, formatValue)
+ * React components, hooks, and customization system for PRADA admin panel.
  *
  * @example
  * ```tsx
- * // Use individual components
- * import { DataTable, DynamicForm, Layout } from '@blysspeak/prada-ui'
+ * // Quick start — drop-in admin with customization
+ * import { App } from '@blysspeak/prada-ui'
  *
- * // Use ready pages
- * import { ModelListPage, LoginPage } from '@blysspeak/prada-ui'
+ * <App config={{
+ *   fields: { byModelField: { User: { avatar: AvatarUpload } } },
+ *   routes: [{ path: '/analytics', element: AnalyticsPage }],
+ *   sidebar: { modelLabels: { User: 'Team' } },
+ * }} />
  *
- * // Use hooks
- * import { useSchema, useAuth, useSettings } from '@blysspeak/prada-ui'
+ * // Use data hooks in custom pages
+ * import { useModelList, useModelCreate } from '@blysspeak/prada-ui'
+ *
+ * function MyPage() {
+ *   const { data, meta } = useModelList('Order', { sort: 'createdAt' })
+ *   const { mutate } = useModelCreate('Order')
+ * }
  * ```
  *
  * @packageDocumentation
  */
+
+// =============================================================================
+// APP - Main entry point (accepts PradaConfig)
+// =============================================================================
+
+export { App, type AppProps } from './App'
+
+// =============================================================================
+// CUSTOMIZATION - Plugin/extension system
+// =============================================================================
+
+export {
+  PradaProvider,
+  usePrada,
+  useFieldComponent,
+  useCellRenderer,
+  type PradaConfig,
+  type FieldComponentProps,
+  type FieldComponent,
+  type FieldOverrides,
+  type CellRendererProps,
+  type CellRenderer,
+  type CellOverrides,
+  type PageOverrides,
+  type SlotOverrides,
+  type CustomRoute,
+  type SidebarItem,
+  type SidebarOverrides,
+  type ActionOverrides
+} from './customization'
+
+// =============================================================================
+// DATA HOOKS - React Query hooks for CRUD operations
+// =============================================================================
+
+export {
+  useModelList,
+  useModelRecord,
+  useModelCreate,
+  useModelUpdate,
+  useModelDelete,
+  type UseModelListParams
+} from './hooks/useModelData'
 
 // =============================================================================
 // PAGES - Ready-to-use page components
@@ -46,9 +88,11 @@ export {
 
 // Data display
 export { DataTable, Pagination } from './components/DataTable'
+export { CellValue } from './components/DataTable/CellValue'
 
 // Forms
 export { DynamicForm } from './components/Form'
+export { FieldRenderer } from './components/Form/FieldRenderer'
 
 // Layout
 export { Layout, Sidebar } from './components/Layout'
@@ -94,8 +138,6 @@ export { SetupProvider, useSetup } from './providers/SetupProvider'
 // HOOKS - Custom React hooks
 // =============================================================================
 
-// Auth and schema hooks are exported from providers above
-// Additional utility hooks:
 export { useTranslation, pluralize } from './i18n/useTranslation'
 
 // =============================================================================

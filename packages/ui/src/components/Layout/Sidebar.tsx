@@ -8,10 +8,12 @@ import {
   ChevronDown,
   ChevronRight,
   LayoutDashboard,
-  Server
+  Server,
+  History
 } from 'lucide-react'
 import { useSchema } from '@/providers/SchemaProvider'
 import { useAuth } from '@/providers/AuthProvider'
+import { usePrada } from '@/customization'
 import { SettingsModal, AnimatedThemeToggler } from '@/components/Settings'
 import { useTranslation } from '@/i18n'
 import styles from './Sidebar.module.css'
@@ -29,6 +31,7 @@ export function Sidebar() {
   const { logout, user } = useAuth()
   const { t } = useTranslation()
   const location = useLocation()
+  const { sidebar: sidebarConfig, routes: customRoutes } = usePrada()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [expanded, setExpanded] = useState<Record<string, boolean>>({ tables: true })
 
@@ -36,7 +39,16 @@ export function Sidebar() {
     setExpanded(prev => ({ ...prev, [id]: !prev[id] }))
   }
 
-  // Определяем имя базы данных из URL или используем дефолтное
+  // Custom logo or default
+  const LogoComponent = sidebarConfig?.logo
+
+  // Filter hidden models
+  const hiddenModels = new Set(sidebarConfig?.hiddenModels?.map(m => m.toLowerCase()) ?? [])
+  const visibleModels = schema?.models.filter(m => !hiddenModels.has(m.name.toLowerCase())) ?? []
+
+  // Model label resolver
+  const getModelLabel = (name: string) => sidebarConfig?.modelLabels?.[name] ?? name
+
   const dbName = 'PostgreSQL'
 
   const menuSections: MenuSection[] = [
@@ -55,10 +67,10 @@ export function Sidebar() {
           id: 'tables',
           label: t('tables'),
           icon: <Server size={18} />,
-          children: schema?.models.map(m => ({
-            name: m.name,
+          children: visibleModels.map(m => ({
+            name: getModelLabel(m.name),
             path: `/models/${m.name.toLowerCase()}`
-          })) || []
+          }))
         }
       ] as any
     }
@@ -75,11 +87,27 @@ export function Sidebar() {
     return false
   }
 
+  // Collect sidebar items from custom routes + explicit extra items
+  const extraItems = [
+    ...(sidebarConfig?.extraItems ?? []),
+    ...(customRoutes?.filter(r => r.sidebar).map(r => ({
+      label: r.sidebar!.label,
+      path: r.path,
+      icon: r.sidebar!.icon
+    })) ?? [])
+  ]
+
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logo}>
-        <Database className={styles.logoIcon} />
-        <span className={styles.logoText}>PRADA</span>
+        {LogoComponent ? (
+          <LogoComponent />
+        ) : (
+          <>
+            <Database className={styles.logoIcon} />
+            <span className={styles.logoText}>PRADA</span>
+          </>
+        )}
       </div>
 
       <nav className={styles.nav}>
@@ -121,13 +149,13 @@ export function Sidebar() {
                     >
                       <Table2 size={16} />
                       <span>{t('tables')}</span>
-                      <span className={styles.badge}>{schema?.models.length || 0}</span>
+                      <span className={styles.badge}>{visibleModels.length}</span>
                       {expanded.tables ? <ChevronDown size={14} className={styles.chevron} /> : <ChevronRight size={14} className={styles.chevron} />}
                     </button>
 
                     {expanded.tables && (
                       <ul className={styles.submenu}>
-                        {schema?.models.map(model => (
+                        {visibleModels.map(model => (
                           <li key={model.name}>
                             <NavLink
                               to={`/models/${model.name.toLowerCase()}`}
@@ -136,7 +164,7 @@ export function Sidebar() {
                               }
                             >
                               <span className={styles.tableIcon}>⊞</span>
-                              <span>{model.name}</span>
+                              <span>{getModelLabel(model.name)}</span>
                               <span className={styles.fieldCount}>{model.fields?.length || 0}</span>
                             </NavLink>
                           </li>
@@ -176,6 +204,34 @@ export function Sidebar() {
                 </ul>
               )}
             </li>
+
+            {/* Audit Log */}
+            <li>
+              <NavLink
+                to="/audit"
+                className={({ isActive }) =>
+                  `${styles.menuItem} ${isActive ? styles.active : ''}`
+                }
+              >
+                <History size={18} />
+                <span>{t('auditLog')}</span>
+              </NavLink>
+            </li>
+
+            {/* Extra sidebar items */}
+            {extraItems.map(item => (
+              <li key={item.path}>
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `${styles.menuItem} ${isActive ? styles.active : ''}`
+                  }
+                >
+                  {item.icon && <item.icon size={18} />}
+                  <span>{item.label}</span>
+                </NavLink>
+              </li>
+            ))}
           </ul>
         )}
       </nav>

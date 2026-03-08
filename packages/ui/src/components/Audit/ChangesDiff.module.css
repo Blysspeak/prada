@@ -1,0 +1,63 @@
+.diff {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.change {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  flex-wrap: wrap;
+}
+
+.fieldName {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: 'Geist Mono Variable', monospace;
+}
+
+.oldValue {
+  color: var(--danger);
+  text-decoration: line-through;
+  font-family: 'Geist Mono Variable', monospace;
+  font-size: 0.8125rem;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arrow {
+  color: var(--text-dimmed);
+  flex-shrink: 0;
+}
+
+.newValue {
+  color: var(--success, #22c55e);
+  font-family: 'Geist Mono Variable', monospace;
+  font-size: 0.8125rem;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.created {
+  color: var(--success, #22c55e);
+  font-weight: 500;
+  font-size: 0.8125rem;
+}
+
+.deleted {
+  color: var(--danger);
+  font-weight: 500;
+  font-size: 0.8125rem;
+}
+
+.noChanges {
+  color: var(--text-dimmed);
+  font-style: italic;
+  font-size: 0.8125rem;
+}
