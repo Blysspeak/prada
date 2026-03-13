@@ -27,6 +27,7 @@ export default defineConfig(({ mode }) => {
             external: [
               'react',
               'react-dom',
+              'react/jsx-runtime',
               'react-router-dom',
               '@tanstack/react-query',
               '@tanstack/react-table',
