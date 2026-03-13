@@ -65,6 +65,24 @@ export interface PradaContext {
  * }
  * ```
  */
+/** Sidebar item declared by a module */
+export interface ModuleSidebarItem {
+  /** Display label */
+  label: string
+  /** Route path (relative to admin base) */
+  path: string
+  /** Lucide icon name (e.g. 'Settings', 'Radio') */
+  icon?: string
+}
+
+/** Custom page declared by a module (rendered as iframe) */
+export interface ModulePage {
+  /** Route path matching sidebar item */
+  path: string
+  /** API endpoint that serves the page HTML */
+  apiPath: string
+}
+
 export interface PradaModule {
   /** Module name (for logging and debugging) */
   name: string
@@ -72,6 +90,10 @@ export interface PradaModule {
   routes?: (ctx: PradaContext) => void | Promise<void>
   /** Middleware applied to all routes */
   middleware?: RequestHandler[]
+  /** Sidebar items to add to the admin panel */
+  sidebar?: ModuleSidebarItem[]
+  /** Custom pages (rendered as iframe in admin layout) */
+  pages?: ModulePage[]
 }
 
 /**
@@ -244,12 +266,18 @@ export async function createPradaServer(
     router.use('/api/audit', authMiddleware, createAuditRoutes(auditStore))
   }
 
-  // Protected API routes (CRUD)
-  router.use('/api', authMiddleware, (req, res, next) => {
-    createCrudRoutes(apiHandler)(req, res, next)
-  })
+  // Module config endpoint (sidebar items + pages from modules) — must be before CRUD
+  if (options.modules) {
+    const moduleConfig = {
+      sidebar: options.modules.flatMap(m => m.sidebar ?? []),
+      pages: options.modules.flatMap(m => m.pages ?? [])
+    }
+    router.get('/api/modules/config', authMiddleware, (_req, res) => {
+      res.json(moduleConfig)
+    })
+  }
 
-  // Initialize modules
+  // Initialize modules (register custom routes before CRUD to take priority)
   if (options.modules) {
     const ctx: PradaContext = {
       prisma: options.prisma,
@@ -265,6 +293,11 @@ export async function createPradaServer(
       }
     }
   }
+
+  // Protected API routes (CRUD)
+  router.use('/api', authMiddleware, (req, res, next) => {
+    createCrudRoutes(apiHandler)(req, res, next)
+  })
 
   // Serve UI static files
   let staticPath = options.staticPath

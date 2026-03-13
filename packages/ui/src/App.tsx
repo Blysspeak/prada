@@ -18,6 +18,8 @@ import {
   AuditLogPage
 } from '@/pages'
 import { usePrada } from '@/customization'
+import { useModulesConfig } from '@/hooks/useModulesConfig'
+import { ModulePage } from '@/pages/ModulePage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +58,7 @@ function AppRoutes() {
   const { isAuthenticated } = useAuth()
   const { isConfigured, isLoading: setupLoading } = useSetup()
   const { pages, routes: customRoutes } = usePrada()
+  const modulesConfig = useModulesConfig()
 
   if (setupLoading) {
     return (
@@ -113,6 +116,11 @@ function AppRoutes() {
         {/* Custom routes */}
         {customRoutes?.map(route => (
           <Route key={route.path} path={route.path} element={<route.element />} />
+        ))}
+
+        {/* Module pages (from server config) */}
+        {modulesConfig.pages.map(page => (
+          <Route key={page.path} path={page.path} element={<ModulePage apiPath={page.apiPath} />} />
         ))}
       </Route>
 

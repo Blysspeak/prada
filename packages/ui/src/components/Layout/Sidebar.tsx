@@ -9,14 +9,24 @@ import {
   ChevronRight,
   LayoutDashboard,
   Server,
-  History
+  History,
+  Radio,
+  Zap,
+  Bot,
+  Globe,
+  type LucideIcon
 } from 'lucide-react'
 import { useSchema } from '@/providers/SchemaProvider'
 import { useAuth } from '@/providers/AuthProvider'
 import { usePrada } from '@/customization'
+import { useModulesConfig } from '@/hooks/useModulesConfig'
 import { SettingsModal, AnimatedThemeToggler } from '@/components/Settings'
 import { useTranslation } from '@/i18n'
 import styles from './Sidebar.module.css'
+
+const iconMap: Record<string, LucideIcon> = {
+  Settings, Radio, Zap, Bot, Globe, Database, Server, History, LayoutDashboard
+}
 
 interface MenuSection {
   id: string
@@ -96,6 +106,9 @@ export function Sidebar() {
       icon: r.sidebar!.icon
     })) ?? [])
   ]
+
+  // Module sidebar items (from server)
+  const modulesConfig = useModulesConfig()
 
   return (
     <aside className={styles.sidebar}>
@@ -232,6 +245,24 @@ export function Sidebar() {
                 </NavLink>
               </li>
             ))}
+
+            {/* Module sidebar items (from server) */}
+            {modulesConfig.sidebar.map(item => {
+              const Icon = item.icon ? iconMap[item.icon] : Settings
+              return (
+                <li key={item.path}>
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `${styles.menuItem} ${isActive ? styles.active : ''}`
+                    }
+                  >
+                    {Icon && <Icon size={18} />}
+                    <span>{item.label}</span>
+                  </NavLink>
+                </li>
+              )
+            })}
           </ul>
         )}
       </nav>
