@@ -15,34 +15,35 @@ export interface BulkDeleteOptions {
 
 export function createBulkDelete({ prisma, schema, config, hooks }: BulkDeleteOptions) {
   return async (modelName: string, ids: (string | number)[]): Promise<{ count: number }> => {
-    const model = schema.models.find(m => m.name === modelName)
+    const model = schema.models.find(m => m.name.toLowerCase() === modelName.toLowerCase())
     if (!model) throw new Error(`Model "${modelName}" not found`)
 
+    const resolvedName = model.name
     const idField = model.fields.find(f => f.isId)
-    if (!idField) throw new Error(`Model "${modelName}" has no id field`)
+    if (!idField) throw new Error(`Model "${resolvedName}" has no id field`)
 
     // Check permission
     const actions = config?.actions || ['create', 'read', 'update', 'delete']
-    if (!actions.includes('delete')) throw new Error(`Delete not allowed for "${modelName}"`)
+    if (!actions.includes('delete')) throw new Error(`Delete not allowed for "${resolvedName}"`)
 
-    const ctx: CrudHookContext = { model: modelName, schema, prisma }
+    const ctx: CrudHookContext = { model: resolvedName, schema, prisma }
 
     // Run beforeDelete hooks for each id
     for (const id of ids) {
       if (hooks?.['*']?.beforeDelete) await hooks['*'].beforeDelete(id, ctx)
-      if (hooks?.[modelName]?.beforeDelete) await hooks[modelName]!.beforeDelete!(id, ctx)
+      if (hooks?.[resolvedName]?.beforeDelete) await hooks[resolvedName]!.beforeDelete!(id, ctx)
     }
 
     const parsedIds = ids.map(id => parseId(model, id))
 
-    const result = await getModelClient(prisma, modelName).deleteMany({
+    const result = await getModelClient(prisma, resolvedName).deleteMany({
       where: { [idField.name]: { in: parsedIds } }
     })
 
     // Run afterDelete hooks for each id
     for (const id of ids) {
       if (hooks?.['*']?.afterDelete) await hooks['*'].afterDelete(id, ctx)
-      if (hooks?.[modelName]?.afterDelete) await hooks[modelName]!.afterDelete!(id, ctx)
+      if (hooks?.[resolvedName]?.afterDelete) await hooks[resolvedName]!.afterDelete!(id, ctx)
     }
 
     return result

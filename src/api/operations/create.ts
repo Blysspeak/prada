@@ -15,32 +15,34 @@ export interface CreateOptions {
 
 export function createCreate({ prisma, schema, config, hooks }: CreateOptions) {
   return async (modelName: string, data: Record<string, unknown>): Promise<Record<string, unknown>> => {
-    const model = schema.models.find(m => m.name === modelName)
+    const model = schema.models.find(m => m.name.toLowerCase() === modelName.toLowerCase())
     if (!model) throw new Error(`Model "${modelName}" not found`)
+
+    const resolvedName = model.name
 
     // Check permission
     const actions = config?.actions || ['create', 'read', 'update', 'delete']
-    if (!actions.includes('create')) throw new Error(`Create not allowed for "${modelName}"`)
+    if (!actions.includes('create')) throw new Error(`Create not allowed for "${resolvedName}"`)
 
-    const ctx: CrudHookContext = { model: modelName, schema, prisma }
+    const ctx: CrudHookContext = { model: resolvedName, schema, prisma }
 
     // Run beforeCreate hooks
     let d = { ...data }
     if (hooks?.['*']?.beforeCreate) d = await hooks['*'].beforeCreate(d, ctx)
-    if (hooks?.[modelName]?.beforeCreate) d = await hooks[modelName]!.beforeCreate!(d, ctx)
+    if (hooks?.[resolvedName]?.beforeCreate) d = await hooks[resolvedName]!.beforeCreate!(d, ctx)
 
     // Get readonly fields and sanitize
     const readonlyFields = config?.fields
       ? Object.entries(config.fields).filter(([, c]) => c.readonly).map(([n]) => n)
       : []
 
-    const record = await getModelClient(prisma, modelName).create({
+    const record = await getModelClient(prisma, resolvedName).create({
       data: sanitizeInput(model, d, readonlyFields)
     })
 
     // Run afterCreate hooks
     if (hooks?.['*']?.afterCreate) await hooks['*'].afterCreate(record, ctx)
-    if (hooks?.[modelName]?.afterCreate) await hooks[modelName]!.afterCreate!(record, ctx)
+    if (hooks?.[resolvedName]?.afterCreate) await hooks[resolvedName]!.afterCreate!(record, ctx)
 
     return record
   }

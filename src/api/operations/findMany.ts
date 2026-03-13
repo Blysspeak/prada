@@ -29,16 +29,17 @@ export interface FindManyOptions {
 
 export function createFindMany({ prisma, schema, config, hooks }: FindManyOptions) {
   return async (modelName: string, params: FindManyParams = {}): Promise<PaginatedResponse> => {
-    const model = schema.models.find(m => m.name === modelName)
+    const model = schema.models.find(m => m.name.toLowerCase() === modelName.toLowerCase())
     if (!model) throw new Error(`Model "${modelName}" not found`)
 
-    const client = getModelClient(prisma, modelName)
-    const ctx: CrudHookContext = { model: modelName, schema, prisma }
+    const resolvedName = model.name
+    const client = getModelClient(prisma, resolvedName)
+    const ctx: CrudHookContext = { model: resolvedName, schema, prisma }
 
     // Run beforeFind hooks
     let p = { ...params }
     if (hooks?.['*']?.beforeFind) p = await hooks['*'].beforeFind(p, ctx)
-    if (hooks?.[modelName]?.beforeFind) p = await hooks[modelName]!.beforeFind!(p, ctx)
+    if (hooks?.[resolvedName]?.beforeFind) p = await hooks[resolvedName]!.beforeFind!(p, ctx)
 
     // Build query
     const { skip, take, page, limit } = parsePagination(p.page, p.limit)
@@ -60,7 +61,7 @@ export function createFindMany({ prisma, schema, config, hooks }: FindManyOption
     // Run afterFind hooks
     let result = data
     if (hooks?.['*']?.afterFind) result = await hooks['*'].afterFind(result, ctx)
-    if (hooks?.[modelName]?.afterFind) result = await hooks[modelName]!.afterFind!(result, ctx)
+    if (hooks?.[resolvedName]?.afterFind) result = await hooks[resolvedName]!.afterFind!(result, ctx)
 
     return { data: result, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } }
   }

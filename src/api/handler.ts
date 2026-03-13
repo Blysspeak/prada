@@ -45,27 +45,33 @@ export function createApiHandler(
   const { models = {}, hooks = {} } = options
   const ctx = { prisma, schema, hooks }
 
+  // Case-insensitive model config lookup
+  const getModelConfig = (name: string) => {
+    const key = Object.keys(models).find(k => k.toLowerCase() === name.toLowerCase())
+    return key ? models[key] : undefined
+  }
+
   return {
     findMany: (model, params = {}) =>
-      createFindMany({ ...ctx, config: models[model] })(model, params),
+      createFindMany({ ...ctx, config: getModelConfig(model) })(model, params),
 
     findOne: (model, id, include) =>
-      createFindOne({ ...ctx, config: models[model] })(model, id, include),
+      createFindOne({ ...ctx, config: getModelConfig(model) })(model, id, include),
 
     create: (model, data) =>
-      createCreate({ ...ctx, config: models[model] })(model, data),
+      createCreate({ ...ctx, config: getModelConfig(model) })(model, data),
 
     update: (model, id, data) =>
-      createUpdate({ ...ctx, config: models[model] })(model, id, data),
+      createUpdate({ ...ctx, config: getModelConfig(model) })(model, id, data),
 
     remove: (model, id) =>
-      createDelete({ ...ctx, config: models[model] })(model, id),
+      createDelete({ ...ctx, config: getModelConfig(model) })(model, id),
 
     bulkDelete: (model, ids) =>
-      createBulkDelete({ ...ctx, config: models[model] })(model, ids),
+      createBulkDelete({ ...ctx, config: getModelConfig(model) })(model, ids),
 
     bulkUpdate: (model, ids, data) =>
-      createBulkUpdate({ ...ctx, config: models[model] })(model, ids, data),
+      createBulkUpdate({ ...ctx, config: getModelConfig(model) })(model, ids, data),
 
     getStats: () =>
       createStats({ prisma, schema })(),
